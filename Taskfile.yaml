@@ -1,0 +1,66 @@
+# yaml-language-server: $schema=https://json.schemastore.org/taskfile.json
+---
+version: "3"
+
+tasks:
+  default:
+    desc: Show help
+    aliases: [h]
+    silent: true
+    cmds:
+      - task -l --sort alphanumeric
+
+  install:
+    desc: install
+    aliases: [i]
+    run: once
+    sources:
+      - package.json
+      - pnpm-lock.yaml
+    cmds:
+      - ni
+
+  clean:
+    desc: clean
+    silent: true
+    cmds:
+      - rm -rf dist
+      - rm -rf coverage
+
+  clean-hard:
+    desc: clean hard
+    cmds:
+      - task: clean
+      - rm -rf node_modules/
+
+  run:
+    desc: run
+    aliases: [r]
+    cmds:
+      - nlx esno src/index.ts
+
+  watch:
+    desc: run (watch mode)
+    aliases: [w]
+    cmds:
+      - nlx esno --watch src/index.ts
+
+  lint:
+    desc: Lint
+    aliases: [l]
+    cmds:
+      - pnpm exec biome check --write ./
+
+  type-check:
+    desc: type-check
+    aliases: [tc]
+    ignore_error: true
+    cmds:
+      - task: install
+      - pnpm exec tsc  --noEmit --project ./tsconfig.json
+
+  check:
+    desc: Run checks
+    cmds:
+      - task: type-check
+      - task: lint
