@@ -6,6 +6,7 @@ import {
   userRepository,
   workOrderRepository,
 } from '../repositories';
+import sns from '../sns';
 import {
   CreateWorkOrderSchema,
   CreateWorkOrderUseCase,
@@ -31,7 +32,7 @@ router.post('/work-orders', async (req, res) => {
   const workOrder = CreateWorkOrderSchema.parse({
     ...req.body,
     companyId: req.headers['company-id'],
-    createdBy: req.headers['user'],
+    createdBy: req.headers.user,
   });
 
   const create = CreateWorkOrderUseCase({
@@ -39,6 +40,7 @@ router.post('/work-orders', async (req, res) => {
     companyRepository,
     workOrderRepository,
     logger,
+    sns,
   });
 
   const createdWorkOrder = await create(workOrder);

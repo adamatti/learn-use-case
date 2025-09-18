@@ -17,8 +17,10 @@ tasks:
     sources:
       - package.json
       - pnpm-lock.yaml
+      - pnpm-workspace.yaml
     cmds:
       - ni
+      - pnpm approve-builds
 
   clean:
     desc: clean
@@ -64,3 +66,11 @@ tasks:
     cmds:
       - task: type-check
       - task: lint
+
+  lambdas:build:
+    desc: Build lambdas
+    cmds: 
+      - task: install
+      - task: clean
+      - task: check
+      - pnpm exec esbuild --bundle --sourcemap --platform=node --target=node20 lambdas/send-notification.handler.ts --outfile=build/send-notification.handler.js --jsx=automatic --external:'@aws-sdk/*'

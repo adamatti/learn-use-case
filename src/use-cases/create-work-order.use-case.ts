@@ -6,6 +6,7 @@ import type {
   WorkOrderRepository,
 } from '../repositories/index';
 import type { WorkOrder } from '../repositories/types';
+import type { SNS } from '../sns';
 import { CompanyNotFoundError, UserNotFoundError } from './errors';
 
 type CreateWorkOrderUseCaseDependencies = {
@@ -13,6 +14,7 @@ type CreateWorkOrderUseCaseDependencies = {
   userRepository: UserRepository;
   workOrderRepository: WorkOrderRepository;
   logger: Logger;
+  sns: SNS;
 };
 
 export const CreateWorkOrderSchema = z.object({
@@ -29,6 +31,7 @@ export const CreateWorkOrderUseCase = ({
   userRepository,
   companyRepository,
   workOrderRepository,
+  sns,
 }: CreateWorkOrderUseCaseDependencies) => {
   return async (workOrder: CreateWorkOrderPayload): Promise<WorkOrder> => {
     logger.debug('Creating work order', { workOrder });
@@ -53,12 +56,19 @@ export const CreateWorkOrderUseCase = ({
       throw new UserNotFoundError('Assigned to user not found');
     }
 
-    return await workOrderRepository.insert({
+    const entity = await workOrderRepository.insert({
       company,
       number: workOrder.number,
       description: workOrder.description,
       createdBy,
       assignedTo,
     });
+
+    await sns.publish('work-order-created', {
+      companyId: entity.company.id,
+      number: entity.number,
+    });
+
+    return entity;
   };
 };
