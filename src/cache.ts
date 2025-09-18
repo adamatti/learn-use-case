@@ -17,4 +17,5 @@ const cache = {
   },
 };
 
+export type Cache = typeof cache;
 export default cache;

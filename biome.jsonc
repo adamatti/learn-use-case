@@ -6,6 +6,9 @@
       "suspicious": {
         "noConsole": "off",
         "noExplicitAny": "off"
+      },
+      "nursery": {
+        "noAwaitInLoop": "off"
       }
     }
   }

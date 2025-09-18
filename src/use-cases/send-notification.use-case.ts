@@ -1,4 +1,5 @@
 import z from 'zod';
+import type { Cache } from '../cache';
 import type { Logger } from '../logger';
 import type { WorkOrderRepository } from '../repositories';
 import { WorkOrderNotFoundError } from './errors';
@@ -6,6 +7,7 @@ import { WorkOrderNotFoundError } from './errors';
 export type SendNotificationDependencies = {
   logger: Logger;
   workOrderRepository: Pick<WorkOrderRepository, 'findById'>;
+  cache: Cache;
 };
 
 export const SendNotificationSchema = z.object({
@@ -18,6 +20,7 @@ type SendNotificationPayload = z.infer<typeof SendNotificationSchema>;
 export const SendNotificationUseCase = ({
   logger,
   workOrderRepository,
+  cache,
 }: SendNotificationDependencies) => {
   return async (payload: SendNotificationPayload) => {
     const workOrder = await workOrderRepository.findById(payload);
@@ -30,11 +33,23 @@ export const SendNotificationUseCase = ({
       Boolean
     );
 
-    for (const user of usersToSendEmail) {
+    for await (const user of usersToSendEmail) {
+      const cacheKey = `notification:${user?.email}:${workOrder.number}`;
+      const hasValue = await cache.get(cacheKey);
+      if (hasValue) {
+        logger.debug('Email already sent to user', {
+          user: user?.email,
+          woNumber: workOrder.number,
+        });
+        continue;
+      }
+
       logger.debug('Sending email to user', {
         user: user?.email,
         woNumber: workOrder.number,
       });
+
+      await cache.set(cacheKey, true);
     }
   };
 };
