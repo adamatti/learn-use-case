@@ -1,9 +1,5 @@
 import z from 'zod';
-import type { CompanyRepository } from '../repositories';
-
-type CreateCompanyUseCaseDependencies = {
-  companyRepository: CompanyRepository;
-};
+import { companyRepository } from '../repositories';
 
 export const CreateCompanySchema = z.object({
   id: z.number(),
@@ -12,10 +8,6 @@ export const CreateCompanySchema = z.object({
 
 type CreateCompanyPayload = z.infer<typeof CreateCompanySchema>;
 
-export const CreateCompanyUseCase = ({
-  companyRepository,
-}: CreateCompanyUseCaseDependencies) => {
-  return async (company: CreateCompanyPayload) => {
-    return await companyRepository.insert(company);
-  };
+export const createCompany = async (company: CreateCompanyPayload) => {
+  return await companyRepository.insert(company);
 };
