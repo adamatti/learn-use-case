@@ -22,5 +22,4 @@ const logger = winston.createLogger({
   ],
 });
 
-export type Logger = typeof logger;
 export default logger;

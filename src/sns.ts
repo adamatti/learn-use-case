@@ -13,5 +13,4 @@ const sns = {
   },
 };
 
-export type SNS = typeof sns;
 export default sns;

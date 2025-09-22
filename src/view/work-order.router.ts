@@ -1,16 +1,9 @@
 import { Router } from 'express';
 import z from 'zod';
-import logger from '../logger';
-import {
-  companyRepository,
-  userRepository,
-  workOrderRepository,
-} from '../repositories';
-import sns from '../sns';
 import {
   CreateWorkOrderSchema,
-  CreateWorkOrderUseCase,
-  ListWorkOrdersUseCase,
+  createWorkOrder,
+  listWorkOrders,
 } from '../use-cases';
 
 const router = Router();
@@ -18,12 +11,7 @@ const router = Router();
 router.get('/work-orders', async (req, res) => {
   const companyId = z.number().parse(req.headers['company-id']);
 
-  const list = ListWorkOrdersUseCase({
-    workOrderRepository,
-    logger,
-  });
-
-  const workOrders = await list({ companyId });
+  const workOrders = await listWorkOrders({ companyId });
 
   res.json(workOrders);
 });
@@ -35,15 +23,7 @@ router.post('/work-orders', async (req, res) => {
     createdBy: req.headers.user,
   });
 
-  const create = CreateWorkOrderUseCase({
-    userRepository,
-    companyRepository,
-    workOrderRepository,
-    logger,
-    sns,
-  });
-
-  const createdWorkOrder = await create(workOrder);
+  const createdWorkOrder = await createWorkOrder(workOrder);
 
   res.status(201).json(createdWorkOrder);
 });
