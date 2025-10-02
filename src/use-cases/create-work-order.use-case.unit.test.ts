@@ -5,21 +5,11 @@ import {
   workOrderRepository,
 } from '../repositories';
 import type { Company, User } from '../repositories/types';
+import type { WorkOrder } from '../repositories/types';
 import sns from '../sns';
 import { createWorkOrder } from './create-work-order.use-case';
 
-vi.mock('../repositories', () => ({
-  companyRepository: {
-    findById: vi.fn(),
-  },
-  userRepository: {
-    findById: vi.fn(),
-  },
-  workOrderRepository: {
-    insert: vi.fn((o) => Promise.resolve(o)),
-  },
-}));
-
+vi.mock('../repositories');
 vi.mock('../sns');
 vi.mock('../logger');
 
@@ -32,6 +22,7 @@ describe('create work order', () => {
     vi.mocked(userRepository.findById).mockResolvedValue({
       id: 1,
     } as unknown as User);
+    vi.mocked(workOrderRepository.insert).mockImplementation(async (o) => o as unknown as WorkOrder);
   });
 
   it('happy path', async () => {
