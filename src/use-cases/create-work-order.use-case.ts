@@ -9,12 +9,12 @@ import type { WorkOrder } from '../repositories/types';
 import type { SNS } from '../sns';
 import { CompanyNotFoundError, UserNotFoundError } from './errors';
 
-type CreateWorkOrderUseCaseDependencies = {
-  companyRepository: CompanyRepository;
-  userRepository: UserRepository;
-  workOrderRepository: WorkOrderRepository;
-  logger: Logger;
-  sns: SNS;
+export type CreateWorkOrderUseCaseDependencies = {
+  companyRepository: Pick<CompanyRepository, 'findById'>;
+  userRepository: Pick<UserRepository, 'findById'>;
+  workOrderRepository: Pick<WorkOrderRepository, 'insert'>;
+  logger: Pick<Logger, 'info'>;
+  sns: Pick<SNS, 'publish'>;
 };
 
 export const CreateWorkOrderSchema = z.object({

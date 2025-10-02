@@ -45,6 +45,9 @@ importers:
       ultracite:
         specifier: 5.0.49
         version: 5.0.49(@types/node@24.5.2)
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.4(@types/node@24.5.2)
 
 packages:
 
