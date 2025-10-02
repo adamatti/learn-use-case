@@ -1,8 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createWorkOrder } from './create-work-order.use-case';
-import sns from '../sns';
-import { companyRepository, userRepository, workOrderRepository } from '../repositories';
+import {
+  companyRepository,
+  userRepository,
+  workOrderRepository,
+} from '../repositories';
 import type { Company, User } from '../repositories/types';
+import sns from '../sns';
+import { createWorkOrder } from './create-work-order.use-case';
 
 vi.mock('../repositories', () => ({
   companyRepository: {
@@ -12,7 +16,7 @@ vi.mock('../repositories', () => ({
     findById: vi.fn(),
   },
   workOrderRepository: {
-    insert: vi.fn(o => Promise.resolve(o)),
+    insert: vi.fn((o) => Promise.resolve(o)),
   },
 }));
 
@@ -53,12 +57,9 @@ describe('create work order', () => {
         description: 'Work Order 1',
       })
     );
-    expect(sns.publish).toHaveBeenCalledWith(
-      'work-order-created',
-      {
-        companyId: 1,
-        number: 1,
-      }
-    );
+    expect(sns.publish).toHaveBeenCalledWith('work-order-created', {
+      companyId: 1,
+      number: 1,
+    });
   });
 });
